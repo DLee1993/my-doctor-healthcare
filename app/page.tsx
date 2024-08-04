@@ -8,17 +8,18 @@ export default function Home() {
             {/* TODO: OTP | Passkey Verification modal */}
             <section className="remove-scrollbar container my-auto">
                 <aside className="sub-container max-w-[496px]">
-                    <figure>
+                    <figure className="flex gap-2">
                         <Image
-                            src="/assets/icons/logo-full.svg"
+                            src="/assets/icons/logo-icon.svg"
                             alt="patient"
                             width={1000}
                             height={1000}
-                            className="h-10 w-fit"
+                            className="h-6 w-fit mb-9"
                         />
+                        <figcaption>MyDoctor</figcaption>
                     </figure>
                     <PatientForm />
-                    <div className="text-14-regular flex justify-between">
+                    <div className="text-14-regular mt-8 flex justify-between">
                         <p>© 2024 MyDoctor</p>
                         <Link href="/?admin=true" className="underline text-green-500">
                             Admin Login
