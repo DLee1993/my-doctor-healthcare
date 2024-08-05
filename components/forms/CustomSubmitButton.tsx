@@ -18,9 +18,10 @@ const CustomSubmitButton = ({ isLoading, className, children }: ButtonProps) => 
                     <Image
                         src="/assets/icons/loader.svg"
                         alt="loader"
+                        width={24}
+                        height={24}
                         className="w-6 h-6 animate-spin"
                     />
-                    Loading...
                 </div>
             ) : (
                 children
