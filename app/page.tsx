@@ -14,7 +14,7 @@ export default function Home() {
                             alt="patient"
                             width={1000}
                             height={1000}
-                            className="h-6 w-fit mb-9"
+                            className="h-6 w-fit mb-8"
                         />
                         <figcaption>MyDoctor</figcaption>
                     </figure>
