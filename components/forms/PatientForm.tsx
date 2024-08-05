@@ -1,14 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { UserFormValidation } from "@/lib/Validation";
+import { createUser } from "@/lib/actions/patient.actions";
+
+import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import CustomFormField, { FormFieldTypes } from "./CustomFormField";
 import CustomSubmitButton from "./CustomSubmitButton";
-import { useState } from "react";
-import { UserFormValidation } from "@/lib/Validation";
-import { useRouter } from "next/navigation";
 
 const PatientForm = () => {
     // - loading state for button
@@ -28,18 +32,20 @@ const PatientForm = () => {
     });
 
     // - submitting user data to twillio
-    async function onSubmit({ name, email, phone }: z.infer<typeof UserFormValidation>) {
+    async function onSubmit(values: z.infer<typeof UserFormValidation>) {
         setIsLoading(true);
 
         try {
-            // const userInfo = { name, email, phone };
+            const user = { name: values.name, email: values.email, phone: values.phone };
 
-            // const generateNewUser = await createUser(userInfo);
+            const newUser = await createUser(user);
 
-            // if (generateNewUser) router.push(`/patients/${generateNewUser.$id}/register`);
+            if (newUser) router.push(`/patients/${newUser.$id}/register`);
         } catch (error) {
             console.log(error);
         }
+
+        setIsLoading(false);
     }
 
     return (
