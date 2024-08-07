@@ -1,5 +1,5 @@
 import Image from "next/image";
-import PatientForm from "@/components/forms/PatientForm";
+import RegisterForm from "@/components/forms/RegisterForm";
 import Link from "next/link";
 
 export default function Home() {
@@ -16,11 +16,11 @@ export default function Home() {
                             height={1000}
                             className="h-6 w-fit mb-8"
                         />
-                        <figcaption>MyDoctor</figcaption>
+                        <figcaption className="font-bold">MyDoctor</figcaption>
                     </figure>
-                    <PatientForm />
+                    <RegisterForm />
                     <div className="text-14-regular mt-8 flex justify-between">
-                        <p>© 2024 MyDoctor</p>
+                        <p className="copyright">© 2024 MyDoctor</p>
                         <Link href="/?admin=true" className="underline text-green-500">
                             Admin Login
                         </Link>
