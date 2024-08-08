@@ -17,7 +17,7 @@ export const PatientFormValidation = z.object({
     email: z.string().email("Invalid email address"),
     phone: z.string().refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
     birthDate: z.coerce.date(),
-    gender: z.enum(["Male", "Female", "Other"]),
+    gender: z.enum(["male", "female", "other"]),
     address: z
         .string()
         .min(5, "Address must be at least 5 characters")
@@ -50,7 +50,7 @@ export const PatientFormValidation = z.object({
     familyMedicalHistory: z.string().optional(),
     pastMedicalHistory: z.string().optional(),
     identificationType: z.string(),
-    identificationNumber: z.string(),
+    identificationNumber: z.string().min(1, "Identification number is required"),
     identificationDocument: z.custom<File[]>(),
     treatmentConsent: z
         .boolean()

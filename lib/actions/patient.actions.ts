@@ -1,5 +1,8 @@
+"use server";
+
 import { ID, Query } from "node-appwrite";
-import { users } from "../appwrite.config";
+import { InputFile } from "node-appwrite/file";
+import { databases, storage, users } from "../appwrite.config";
 import { parseStringify } from "../utils";
 
 export const createUser = async (user: CreateUserParams) => {
@@ -31,5 +34,47 @@ export const getUser = async (userId: string) => {
         return parseStringify(user);
     } catch (error) {
         console.error(error);
+    }
+};
+
+export const registerPatient = async ({
+    identificationDocument,
+    ...patient
+}: RegisterUserParams) => {
+    try {
+        // add patient data to appwrite storage
+        let file;
+
+        if (identificationDocument) {
+            const inputFile = InputFile.fromBuffer(
+                identificationDocument?.get("blobFile") as Blob,
+                identificationDocument?.get("fileName") as string
+            );
+
+            file = await storage.createFile(
+                `${process.env.NEXT_PUBLIC_DB_STORAGE}`,
+                ID.unique(),
+                inputFile
+            );
+        }
+
+        console.log({
+            identificationDocumentId: file?.$id || null,
+            identificationDocumentUrl: `${process.env.NEXT_PUBLIC_ENDPOINT}/storage/buckets/${process.env.NEXT_PUBLIC_DB_STORAGE}/files/${file?.$id}/file/view?project/=${process.env.NEXT_PUBLIC_PROJECT_ID}`,
+        });
+
+        const newPatient = await databases.createDocument(
+            `${process.env.DATABASE_ID}`,
+            `${process.env.PATIENT_DB_COLLECTION}`,
+            ID.unique(),
+            {
+                identificationDocumentId: file?.$id || null,
+                identificationDocumentUrl: `${process.env.NEXT_PUBLIC_ENDPOINT}/storage/buckets/${process.env.NEXT_PUBLIC_DB_STORAGE}/files/${file?.$id}/file/view?project/=${process.env.NEXT_PUBLIC_PROJECT_ID}`,
+                ...patient,
+            }
+        );
+        return parseStringify(newPatient);
+    } catch (error) {
+        console.log(error);
     }
 };

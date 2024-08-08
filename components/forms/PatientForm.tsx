@@ -6,15 +6,15 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { UserFormValidation } from "@/lib/Validation";
-import { createUser } from "@/lib/actions/patient.actions";
+import { PatientFormValidation } from "@/lib/Validation";
+import { registerPatient } from "@/lib/actions/patient.actions";
 
 import { useForm } from "react-hook-form";
 import { Form, FormControl } from "@/components/ui/form";
 import CustomFormField, { FormFieldTypes } from "../CustomFormField";
 import CustomSubmitButton from "../CustomSubmitButton";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Doctors, GenderOptions, IdentificationTypes } from "@/constants";
+import { Doctors, GenderOptions, IdentificationTypes, PatientFormDefaultValues } from "@/constants";
 import { Label } from "../ui/label";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
@@ -28,9 +28,10 @@ const PatientForm = ({ user }: { user: User }) => {
     const router = useRouter();
 
     // - setting resolvers and default values for react hook form
-    const form = useForm<z.infer<typeof UserFormValidation>>({
-        resolver: zodResolver(UserFormValidation),
+    const form = useForm<z.infer<typeof PatientFormValidation>>({
+        resolver: zodResolver(PatientFormValidation),
         defaultValues: {
+            ...PatientFormDefaultValues,
             name: "",
             email: "",
             phone: "",
@@ -38,21 +39,39 @@ const PatientForm = ({ user }: { user: User }) => {
     });
 
     // - submitting user data to twillio
-    async function onSubmit(values: z.infer<typeof UserFormValidation>) {
-        console.log(values);
-        // setIsLoading(true);
+    async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
+        setIsLoading(true);
 
-        // try {
-        //     const user = { name: values.name, email: values.email, phone: values.phone };
+        let formData;
 
-        //     const newUser = await createUser(user);
+        if (values.identificationDocument && values.identificationDocument.length > 0) {
+            // blob is a version of the document the browser is able to read
+            const blobFile = new Blob([values.identificationDocument[0]], {
+                type: values.identificationDocument[0].type,
+            });
 
-        //     if (newUser) router.push(`/patients/${newUser.$id}/register`);
-        // } catch (error) {
-        //     console.log(error);
-        // }
+            formData = new FormData();
+            // Add the new file
+            formData.append("blobFile", blobFile);
+            formData.append("fileName", values.identificationDocument[0].name);
+        }
 
-        // setIsLoading(false);
+        try {
+            const patientData = {
+                ...values,
+                userId: user.$id,
+                birthDate: new Date(values.birthDate),
+                identificationDocument: formData,
+            };
+
+            const patient = await registerPatient(patientData);
+
+            if (patient) router.push("/patients/user.$id/new-appointment");
+        } catch (error) {
+            console.log(error);
+        }
+
+        setIsLoading(false);
     }
 
     return (
@@ -108,7 +127,6 @@ const PatientForm = ({ user }: { user: User }) => {
                                     <RadioGroup
                                         className="flex h-11 gap6 xl:justify-between"
                                         onValueChange={field.onChange}
-                                        defaultValue={field.value}
                                     >
                                         {GenderOptions.map((option) => (
                                             <div key={option} className="radio-group">
@@ -151,7 +169,7 @@ const PatientForm = ({ user }: { user: User }) => {
                         />
                         <CustomFormField
                             control={form.control}
-                            fieldType={FormFieldTypes.INPUT}
+                            fieldType={FormFieldTypes.PHONE_INPUT}
                             name="emergencyContactNumber"
                             label="Emergency Contact Number"
                             placeholder="(555) 123-4567"
