@@ -88,7 +88,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
                         height={24}
                         width={24}
                         alt="user"
-                        className="ml-2 w-6"
+                        className="ml-2 w-6 h-6"
                     />
                     <FormControl>
                         <DatePicker
@@ -161,13 +161,13 @@ const CustomFormField = (props: CustomProps) => {
             name={name}
             render={({ field }) => (
                 <FormItem className="flex-1">
-                    <div className="flex gap-2 h-5">
+                    <div className="flex gap-2">
                         {props.fieldType !== FormFieldTypes.CHECKBOX && label && (
                             <FormLabel className="shad-input-label">{label}</FormLabel>
                         )}
-                        <FormMessage className="shad-error" />
                     </div>
                     <RenderField field={field} props={props} />
+                    <FormMessage className="shad-error w-full" />
                 </FormItem>
             )}
         />
